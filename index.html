@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Wrap LI Content in P Tags</title>
+    <style>
+        #output {
+            white-space: pre-wrap;
+            /* respects newlines and spaces */
+            border: none;
+            padding: 10px;
+            margin-top: 10px;
+            overflow: auto;
+            /* ensures content can scroll if it overflows */
+            max-height: 500px;
+            /* maximum height before scrolling */
+            word-break: break-word;
+            /* prevents single long strings from overflowing */
+            width: 80%;
+            margin: auto;
+        }
+
+        textarea {
+            width: 80%;
+            min-height: 150px;
+            /* Minimum height for better usability */
+            margin-bottom: 10px;
+            /* Spacing between the textarea and the output */
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <h1>SHOPIFY</h1>
+    </center>
+    <br>
+    <center>
+        <textarea id="inputHtml" rows="10">
+    <li><a href="#carla-piece-of-art">Carla</a> Best Crossfit OnlyFans Latina Model</li>
+    <li><a href="#musclegirl31">Muscle Girl</a> Best Crossfitter OnlyFans Wife</li>
+</textarea>
+    </center>
+
+    <div id="output"></div>
+
+    <script>
+        function processHtml() {
+            const inputHtml = document.getElementById('inputHtml').value.trim();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(inputHtml, 'text/html');
+
+            // Use a regular expression to match <p> tags containing '[any content]'
+            doc.querySelectorAll('p').forEach(p => {
+                // This regex matches any content within square brackets
+                if (/\[.*?\]/.test(p.textContent)) {
+                    p.remove();
+                }
+            });
+
+            // doc.querySelectorAll('li').forEach(li => {
+            //     const p = doc.createElement('p');
+            //     Array.from(li.childNodes).forEach(child => p.appendChild(child));
+            //     li.innerHTML = '';
+            //     li.appendChild(p);
+            // });
+
+            // Iterate over all <a> tags to set target and rel attributes.
+            doc.querySelectorAll('a').forEach(a => {
+                a.setAttribute('target', 'blank');
+                a.setAttribute('rel', 'sponsored');
+            });
+
+            // A list to hold references to <ul> elements that meet the condition
+                let qualifyingULs = [];
+
+            // Process each <li> and check for Google Docs links and empty <p> tags
+            doc.querySelectorAll('li').forEach(li => {
+                const googleDocsLink = li.querySelector('a[href*="docs.google.com"]');
+                if (googleDocsLink) {
+                    const newHref = googleDocsLink.getAttribute('href').split('#')[1];
+                    googleDocsLink.setAttribute('href', '#' + newHref);
+                    if (!qualifyingULs.includes(li.parentNode)) {
+                        qualifyingULs.push(li.parentNode);
+                    }
+                }
+
+                li.querySelectorAll('span').forEach(span => span.removeAttribute('style'));
+                li.removeAttribute('style');
+
+                // Check and remove <p> tags with only non-breaking spaces
+                li.querySelectorAll('p').forEach(p => {
+                    if (p.innerHTML.trim() === '&nbsp;' || p.textContent.trim() === '') {
+                        p.remove();  // Remove the <p> tag if it only contains &nbsp; or is empty
+                    } else if (!li.querySelector('p')) {
+                        // Ensure the content is wrapped in a <p> tag if not already
+                        const p = doc.createElement('p');
+                        while (li.firstChild) {
+                            p.appendChild(li.firstChild);
+                        }
+                        li.appendChild(p);
+                    }
+                });
+            });
+
+            // Process only those <ul> elements that are in the qualifyingULs array
+            qualifyingULs.forEach(ul => {
+                let nextSibling = ul.nextSibling;
+                // Navigate through siblings to find the next <p> tag
+                while (nextSibling && nextSibling.nodeType === Node.TEXT_NODE) {
+                    if (!nextSibling.textContent.trim()) {
+                        nextSibling = nextSibling.nextSibling;
+                    } else {
+                        break;
+                    }
+                }
+                // Convert <p> tag into <h3> if it immediately follows a qualifying <ul>
+                if (nextSibling && nextSibling.tagName === 'P') {
+                    const h3 = doc.createElement('h3');
+                    h3.innerHTML = nextSibling.innerHTML;
+                    nextSibling.parentNode.replaceChild(h3, nextSibling);
+                }
+            });
+
+
+            // doc.querySelectorAll('h3').forEach(h3 => {
+            //     const aTag = h3.querySelector('a');
+            //     if (aTag) {
+            //         const username = aTag.getAttribute('href').substring(1);
+            //         const onlyFansLink = doc.querySelector(`a[href*="onlyfans.com/${username}"]`);
+            //         if (onlyFansLink) {
+            //             h3.id = username;
+            //             aTag.href = onlyFansLink.href;
+            //             aTag.target = "blank";
+            //             aTag.rel = "sponsored";
+
+            //             const numberEndPos = h3.textContent.indexOf('.') + 1;
+
+            //             h3.innerHTML = `<span style="font-family: Lato, Helvetica, Arial, sans-serif; font-size: 1.3rem;">${h3.textContent.slice(0, numberEndPos)}</span>${h3.innerHTML.slice(numberEndPos)}`;
+            //             h3.appendChild(document.createElement('br'));
+            //         }
+            //     }
+            // });
+
+            // Process each <h3> to check for specific structured content
+            // doc.querySelectorAll('h3').forEach(h3 => {
+            //     const aTag = h3.querySelector('a[href*="docs.google.com"]');
+            //     if (aTag) {
+            //         const username = aTag.getAttribute('href').split('#')[1];
+            //         const onlyFansLink = doc.querySelector(`a[href*="onlyfans.com/${username}"]`);
+            //         if (onlyFansLink) {
+            //             h3.id = username;  // Set the id of the <h3> to the username
+            //             aTag.href = onlyFansLink.href;  // Update the href to point to OnlyFans link
+            //             aTag.target = "blank";  // Ensure links open in a new tab
+            //             aTag.rel = "sponsored";  // Mark the link as sponsored
+
+            //             // Apply custom styling and structure to the <h3>
+            //             const numberEndPos = h3.textContent.indexOf('.') + 1;
+            //             h3.innerHTML = `<span style="font-family: Lato, Helvetica, Arial, sans-serif; font-size: 1.3rem;">${h3.textContent.slice(0, numberEndPos)}</span>${h3.innerHTML.slice(numberEndPos)}`;
+            //             h3.appendChild(document.createElement('br'));  // Add a break line for better formatting
+            //         }
+            //     }
+            // });
+
+            doc.querySelectorAll('h3').forEach(h3 => {
+                const aTag = h3.querySelector('a');
+                if (aTag) {
+                    const username = aTag.getAttribute('href').substring(1); 
+                    const onlyFansLink = doc.querySelector(`a[href*="onlyfans.com/${username}"]`);
+                    if (onlyFansLink) {
+                        h3.id = username;  
+                        aTag.href = onlyFansLink.href;  
+                        aTag.target = "blank";
+                        aTag.rel = "sponsored";
+
+                        const numberEndPos = h3.textContent.indexOf('.') + 1;
+
+                        // h3.innerHTML = `<span style="font-family: Lato, Helvetica, Arial, sans-serif; font-size: 1.3rem;">${h3.textContent.slice(0, numberEndPos)}</span>${h3.innerHTML.slice(numberEndPos)}`;
+                        h3.innerHTML = `${h3.textContent.slice(0, numberEndPos)} ${h3.innerHTML.slice(numberEndPos)}`;
+                        h3.appendChild(document.createElement('br')); 
+                    }
+                }
+
+                // Clean up <h3> tags as specified
+                let cleanedContent = h3.outerHTML.replace(/&lt;h3 id=“(.+?)”&gt;/g, '<h3 id="$1">');
+                cleanedContent = cleanedContent.replace(/&ndash;/g, '');
+                cleanedContent = cleanedContent.replace(/&lt;\/h3&gt;/g, '</h3>'); // Properly close the tag
+                h3.outerHTML = cleanedContent;
+            });
+
+              // Remove empty <h3> tags
+                doc.querySelectorAll('h3').forEach(h3 => {
+                if (h3.textContent.trim() === '') {
+                    h3.remove();
+                }
+            });
+
+            doc.querySelectorAll('p').forEach(p => {
+                if (p.textContent.includes('Features:') || p.textContent.includes('Where to Follow:')) {
+                    // Remove all <br> tags first
+                    p.innerHTML = p.innerHTML.replace(/<br\s*\/?>/g, '');
+
+                    // // Then add exactly two <br> tags
+                    // p.innerHTML += '<br><br>';
+                }
+            });
+
+            doc.querySelectorAll('p').forEach(p => {
+
+                // Remove empty <p> tags.
+                if (p.textContent.trim() === '') {
+                    p.parentNode.removeChild(p);
+                }
+            });
+
+            // Convert any <h3> that contains "Frequently Asked Questions" to <h2>.
+            doc.querySelectorAll('h3').forEach(h3 => {
+                if (h3.textContent.includes("Frequently Asked Questions")) {
+                    h3.outerHTML = `<h2>${h3.innerHTML}</h2>`;
+                }
+            });
+
+            let isPurBlock = false;
+            let isFirstH3 = true;
+
+            doc.querySelectorAll('p, h3').forEach(node => {
+                if (node.tagName === 'H3' && isFirstH3) {
+                    // Change the first <h3> to <h2>.
+                    isFirstH3 = false;
+                    node.outerHTML = node.outerHTML.replace(/h3/g, 'h2');
+                } else if (node.tagName === 'P') {
+                    // Toggle the isPurBlock flag and remove paragraph if it contains the specific comment.
+                    if (node.innerHTML.includes('&lt;!-- pur table block --&gt;')) {
+                        isPurBlock = !isPurBlock;
+                        // Remove adjacent whitespace or empty text nodes before the pur table block.
+                        if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE && node.previousSibling.textContent.trim() === '') {
+                            node.previousSibling.remove();
+                        }
+                        // Remove the pur table block paragraph itself.
+                        node.remove();
+                        return;  // Skip further processing for this paragraph.
+                    }
+
+                    // Remove the paragraph if it is within a pur table block.
+                    if (isPurBlock) {
+                        // Remove adjacent whitespace or empty text nodes after the pur table block.
+                        if (node.nextSibling && node.nextSibling.nodeType === Node.TEXT_NODE && node.nextSibling.textContent.trim() === '') {
+                            node.nextSibling.remove();
+                        }
+                        // Remove the paragraph within the pur table block.
+                        node.remove();
+                    }
+                }
+            });
+
+            const serializer = new XMLSerializer();
+            let serializedHtml = serializer.serializeToString(doc.body);
+
+            serializedHtml = serializedHtml
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/&lt;br&gt;/g, '<br>')
+                .replace(/&lt;\/h3&gt;/g, '&lt;/h3&gt;<br>')  // Add line break after </h3> tags.
+                .replace(/&lt;\/h2&gt;/g, '&lt;/h2&gt;<br>') 
+                // Add line break after </p> tags not inside <li> tags.
+                .replace(/&lt;\/p&gt;(?!((?!&lt;\/p&gt;).)*&lt;\/li&gt;)/g, '&lt;/p&gt;<br>')  
+                .replace(/&lt;ul&gt;/g, '&lt;ul&gt;<br>')     // Add line break after <ul> tags.
+                .replace(/&lt;\/ul&gt;/g, '&lt;/ul&gt;<br>')  // Add line break after </ul> tags.
+                .replace(/&lt;li&gt;/g, '    &lt;li&gt;')     // Add four spaces before <li> tags.
+                .replace(/&lt;\/li&gt;/g, '&lt;/li&gt;<br>') // Add line break after </li> tags.
+                // Add two line breaks before <p>Features:<br /><br /></p>
+                .replace(/&lt;p&gt;Features:&lt;br \/&gt;&lt;br \/&gt;&lt;\/p&gt;/g, '<br><br>&lt;p&gt;Features:&lt;br \/&gt;&lt;br \/&gt;&lt;/p&gt;'); 
+
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = serializedHtml;
+    }
+
+    document.getElementById('inputHtml').addEventListener('input', processHtml);
+    document.addEventListener('DOMContentLoaded', processHtml);
+
+    </script>
+
+</body>
+
+</html>
