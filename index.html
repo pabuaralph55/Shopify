@@ -37,14 +37,11 @@
     </center>
     <br>
     <center>
-        <textarea id="inputHtml" rows="10">
-    <li><a href="#carla-piece-of-art">Carla</a> Best Crossfit OnlyFans Latina Model</li>
-    <li><a href="#musclegirl31">Muscle Girl</a> Best Crossfitter OnlyFans Wife</li>
-</textarea>
+        <textarea id="inputHtml" rows="10"></textarea>
     </center>
 
     <div id="output"></div>
-
+   
     <script>
         function processHtml() {
             const inputHtml = document.getElementById('inputHtml').value.trim();
@@ -57,6 +54,13 @@
                 if (/\[.*?\]/.test(p.textContent)) {
                     p.remove();
                 }
+                // Convert paragraphs containing '?' into <h3> elements
+                // else if (p.textContent.includes("?")) {
+                //     const h3 = document.createElement("h3");
+                //     h3.textContent = p.textContent;
+                //     p.replaceWith(h3);
+                // }
+                
             });
 
             // doc.querySelectorAll('li').forEach(li => {
@@ -67,10 +71,9 @@
             // });
 
             // Iterate over all <a> tags to set target and rel attributes.
-            doc.querySelectorAll('a').forEach(a => {
-                a.setAttribute('target', 'blank');
-                a.setAttribute('rel', 'sponsored');
-            });
+            // doc.querySelectorAll('a').forEach(a => {
+            //     a.setAttribute('target', 'blank');
+            // });
 
             // A list to hold references to <ul> elements that meet the condition
                 let qualifyingULs = [];
@@ -93,14 +96,16 @@
                 li.querySelectorAll('p').forEach(p => {
                     if (p.innerHTML.trim() === '&nbsp;' || p.textContent.trim() === '') {
                         p.remove();  // Remove the <p> tag if it only contains &nbsp; or is empty
-                    } else if (!li.querySelector('p')) {
-                        // Ensure the content is wrapped in a <p> tag if not already
-                        const p = doc.createElement('p');
-                        while (li.firstChild) {
-                            p.appendChild(li.firstChild);
-                        }
-                        li.appendChild(p);
-                    }
+                    } 
+                    
+                    // else if (!li.querySelector('p')) {
+                    //     // Ensure the content is wrapped in a <p> tag if not already
+                    //     const p = doc.createElement('p');
+                    //     while (li.firstChild) {
+                    //         p.appendChild(li.firstChild);
+                    //     }
+                    //     li.appendChild(p);
+                    // }
                 });
             });
 
@@ -116,11 +121,11 @@
                     }
                 }
                 // Convert <p> tag into <h3> if it immediately follows a qualifying <ul>
-                if (nextSibling && nextSibling.tagName === 'P') {
-                    const h3 = doc.createElement('h3');
-                    h3.innerHTML = nextSibling.innerHTML;
-                    nextSibling.parentNode.replaceChild(h3, nextSibling);
-                }
+                // if (nextSibling && nextSibling.tagName === 'P') {
+                //     const h3 = doc.createElement('h3');
+                //     h3.innerHTML = nextSibling.innerHTML;
+                //     nextSibling.parentNode.replaceChild(h3, nextSibling);
+                // }
             });
 
 
@@ -215,44 +220,44 @@
             });
 
             // Convert any <h3> that contains "Frequently Asked Questions" to <h2>.
-            doc.querySelectorAll('h3').forEach(h3 => {
-                if (h3.textContent.includes("Frequently Asked Questions")) {
-                    h3.outerHTML = `<h2>${h3.innerHTML}</h2>`;
-                }
-            });
+            // doc.querySelectorAll('h3').forEach(h3 => {
+            //     if (h3.textContent.includes("Frequently Asked Questions")) {
+            //         h3.outerHTML = `<h2>${h3.innerHTML}</h2>`;
+            //     }
+            // });
 
-            let isPurBlock = false;
-            let isFirstH3 = true;
+            // let isPurBlock = false;
+            // let isFirstH3 = true;
 
-            doc.querySelectorAll('p, h3').forEach(node => {
-                if (node.tagName === 'H3' && isFirstH3) {
-                    // Change the first <h3> to <h2>.
-                    isFirstH3 = false;
-                    node.outerHTML = node.outerHTML.replace(/h3/g, 'h2');
-                } else if (node.tagName === 'P') {
-                    // Toggle the isPurBlock flag and remove paragraph if it contains the specific comment.
-                    if (node.innerHTML.includes('&lt;!-- pur table block --&gt;')) {
-                        isPurBlock = !isPurBlock;
-                        // Remove adjacent whitespace or empty text nodes before the pur table block.
-                        if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE && node.previousSibling.textContent.trim() === '') {
-                            node.previousSibling.remove();
-                        }
-                        // Remove the pur table block paragraph itself.
-                        node.remove();
-                        return;  // Skip further processing for this paragraph.
-                    }
+            // doc.querySelectorAll('p, h3').forEach(node => {
+            //     if (node.tagName === 'H3' && isFirstH3) {
+            //         // Change the first <h3> to <h2>.
+            //         isFirstH3 = false;
+            //         node.outerHTML = node.outerHTML.replace(/h3/g, 'h2');
+            //     } else if (node.tagName === 'P') {
+            //         // Toggle the isPurBlock flag and remove paragraph if it contains the specific comment.
+            //         if (node.innerHTML.includes('&lt;!-- pur table block --&gt;')) {
+            //             isPurBlock = !isPurBlock;
+            //             // Remove adjacent whitespace or empty text nodes before the pur table block.
+            //             if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE && node.previousSibling.textContent.trim() === '') {
+            //                 node.previousSibling.remove();
+            //             }
+            //             // Remove the pur table block paragraph itself.
+            //             node.remove();
+            //             return;  // Skip further processing for this paragraph.
+            //         }
 
-                    // Remove the paragraph if it is within a pur table block.
-                    if (isPurBlock) {
-                        // Remove adjacent whitespace or empty text nodes after the pur table block.
-                        if (node.nextSibling && node.nextSibling.nodeType === Node.TEXT_NODE && node.nextSibling.textContent.trim() === '') {
-                            node.nextSibling.remove();
-                        }
-                        // Remove the paragraph within the pur table block.
-                        node.remove();
-                    }
-                }
-            });
+            //         // Remove the paragraph if it is within a pur table block.
+            //         if (isPurBlock) {
+            //             // Remove adjacent whitespace or empty text nodes after the pur table block.
+            //             if (node.nextSibling && node.nextSibling.nodeType === Node.TEXT_NODE && node.nextSibling.textContent.trim() === '') {
+            //                 node.nextSibling.remove();
+            //             }
+            //             // Remove the paragraph within the pur table block.
+            //             node.remove();
+            //         }
+            //     }
+            // });
 
             const serializer = new XMLSerializer();
             let serializedHtml = serializer.serializeToString(doc.body);
